@@ -106,6 +106,8 @@ pub struct BarChart<'a> {
     max: Option<u64>,
     /// direction of the bars
     direction: Direction,
+    /// inversion of the bars
+    is_inverted: bool,
 }
 
 impl Default for BarChart<'_> {
@@ -123,6 +125,7 @@ impl Default for BarChart<'_> {
             bar_set: symbols::bar::NINE_LEVELS,
             style: Style::default(),
             direction: Direction::Vertical,
+            is_inverted: false,
         }
     }
 }
@@ -409,6 +412,31 @@ impl<'a> BarChart<'a> {
     #[must_use = "method moves the value of self and returns the modified value"]
     pub const fn direction(mut self, direction: Direction) -> Self {
         self.direction = direction;
+        self
+    }
+
+    /// Set inversion of the bars.
+    ///
+    /// 'false' is the default value.
+    ///
+    /// # Examples
+    ///
+    /// Vertical bars
+    /// ```plain
+    /// f b
+    /// █ █
+    ///   █
+    /// ```
+    ///
+    /// Horizontal bars
+    /// ```plain
+    /// █foo██
+    ///
+    /// █bar██
+    /// ```
+    #[must_use = "method moves the value of self and returns the modified value"]
+    pub const fn inverted(mut self) -> Self {
+        self.is_inverted = true;
         self
     }
 }
