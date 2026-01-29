@@ -723,7 +723,7 @@ impl BarChart<'_> {
         let bars_area = {
             let margin = u16::from(label_size != 0);
             Rect {
-                x: area.left(), // + label_size + margin,
+                x: area.left(),
                 width: area.width.saturating_sub(label_size).saturating_sub(margin),
                 ..area
             }
@@ -762,7 +762,7 @@ impl BarChart<'_> {
                     buf.set_line(label_x, bar_value_area.top(), label, label_size);
                 }
 
-                bar.render_value_with_different_styles(
+                bar.render_value_with_different_styles_inverted(
                     buf,
                     bar_value_area,
                     bar_length as usize,

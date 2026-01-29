@@ -264,6 +264,64 @@ impl<'a> Bar<'a> {
         }
     }
 
+    /// Render the value of the inverted bar.
+    ///
+    /// [`text_value`](Bar::text_value) is used if set, otherwise the value is converted to string.
+    /// The value is rendered using `value_style`. If the value width is greater than the
+    /// bar width, then the value is split into 2 parts. the first part is rendered in the bar
+    /// using `value_style`. The second part is rendered outside the bar using `bar_style`
+    pub(super) fn render_value_with_different_styles_inverted(
+        &self,
+        buf: &mut Buffer,
+        area: Rect,
+        bar_length: usize,
+        default_value_style: Style,
+        bar_style: Style,
+    ) {
+        let value = self.value.to_string();
+        let text = self.text_value.as_ref().unwrap_or(&value);
+        let text_length = text.len();
+
+        if !text.is_empty() {
+            let default_style = default_value_style.patch(self.value_style);
+
+            // Since the value may be longer thanthe bar itself, we need to use 2 different styles
+            // while rendering. Render the second part with the default value style
+            if text_length > bar_length {
+                //Find the last character boundary at or before bar begins
+                let over_length = text_length - bar_length; // this won't overflow, text_length is larger
+
+                let (first, second) = text.split_at(over_length);
+
+                let bar_style = bar_style.patch(self.style);
+                buf.set_stringn(
+                    area.width - text_length as u16,
+                    area.y,
+                    first,
+                    over_length,
+                    bar_style,
+                );
+
+                buf.set_stringn(
+                    area.width - second.len() as u16,
+                    area.y,
+                    second,
+                    bar_length,
+                    default_style,
+                );
+                return;
+            }
+
+            buf.set_stringn(
+                area.width - text_length as u16,
+                area.y,
+                text,
+                bar_length,
+                default_style,
+            );
+        }
+    }
+
     pub(super) fn render_label(
         &self,
         buf: &mut Buffer,
