@@ -7,6 +7,14 @@ pub const THREE_EIGHTHS: &str = "▃";
 pub const ONE_QUARTER: &str = "▂";
 pub const ONE_EIGHTH: &str = "▁";
 
+pub const UPPER_ONE_EIGHTH: &str = "▔";
+pub const UPPER_ONE_QUARTER: &str = "🮂";
+pub const UPPER_THREE_EIGHTHS: &str = "🮃";
+pub const UPPER_HALF: &str = "▀";
+pub const UPPER_FIVE_EIGHTHS: &str = "🮄";
+pub const UPPER_THREE_QUARTERS: &str = "🮅";
+pub const UPPER_SEVEN_EIGHTHS: &str = "🮆";
+
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub struct Set<'a> {
     pub full: &'a str,
@@ -47,5 +55,17 @@ pub const NINE_LEVELS: Set = Set {
     three_eighths: THREE_EIGHTHS,
     one_quarter: ONE_QUARTER,
     one_eighth: ONE_EIGHTH,
+    empty: " ",
+};
+
+pub const UPPER_NINE_LEVELS: Set = Set {
+    full: FULL,
+    seven_eighths: UPPER_SEVEN_EIGHTHS,
+    three_quarters: UPPER_THREE_QUARTERS,
+    five_eighths: UPPER_FIVE_EIGHTHS,
+    half: UPPER_HALF,
+    three_eighths: UPPER_THREE_EIGHTHS,
+    one_quarter: UPPER_ONE_QUARTER,
+    one_eighth: UPPER_ONE_EIGHTH,
     empty: " ",
 };
