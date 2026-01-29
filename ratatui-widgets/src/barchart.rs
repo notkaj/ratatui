@@ -707,6 +707,85 @@ impl BarChart<'_> {
             bar_x += self.group_gap;
         }
     }
+
+    fn render_horizontal_inverted(&self, buf: &mut Buffer, area: Rect) {
+        // get the longest label
+        let label_size = self
+            .data
+            .iter()
+            .flat_map(|group| group.bars.iter().map(|bar| &bar.label))
+            .flatten() // bar.label is an Option<Line>
+            .map(Line::width)
+            .max()
+            .unwrap_or(0) as u16;
+
+        let label_x = area.width - label_size;
+        let bars_area = {
+            let margin = u16::from(label_size != 0);
+            Rect {
+                x: area.left(), // + label_size + margin,
+                width: area.width.saturating_sub(label_size).saturating_sub(margin),
+                ..area
+            }
+        };
+
+        let group_ticks = self.group_ticks(bars_area.height, bars_area.width);
+
+        // print all visible bars, label and values
+        let mut bar_y = bars_area.top();
+        for (ticks_vec, group) in group_ticks.into_iter().zip(self.data.iter()) {
+            for (ticks, bar) in ticks_vec.into_iter().zip(group.bars.iter()) {
+                let bar_length = (ticks / 8) as u16;
+                let bar_style = self.bar_style.patch(bar.style);
+
+                for y in 0..self.bar_width {
+                    let bar_y = bar_y + y;
+                    for x in 0..bars_area.width {
+                        let symbol = if x < bar_length {
+                            self.bar_set.full
+                        } else {
+                            self.bar_set.empty
+                        };
+                        buf[(bars_area.right() - x, bar_y)]
+                            .set_symbol(symbol)
+                            .set_style(bar_style);
+                    }
+                }
+
+                let bar_value_area = Rect {
+                    y: bar_y + (self.bar_width >> 1),
+                    ..bars_area
+                };
+
+                // label
+                if let Some(label) = &bar.label {
+                    buf.set_line(label_x, bar_value_area.top(), label, label_size);
+                }
+
+                bar.render_value_with_different_styles(
+                    buf,
+                    bar_value_area,
+                    bar_length as usize,
+                    self.value_style,
+                    self.bar_style,
+                );
+
+                bar_y += self.bar_gap + self.bar_width;
+            }
+
+            // if group_gap is zero, then there is no place to print the group label
+            // check also if the group label is still inside the visible area
+            let label_y = bar_y - self.bar_gap;
+            if self.group_gap > 0 && label_y < bars_area.bottom() {
+                let label_rect = Rect {
+                    y: label_y,
+                    ..bars_area
+                };
+                group.render_label(buf, label_rect, self.label_style);
+                bar_y += self.group_gap;
+            }
+        }
+    }
 }
 
 impl Widget for BarChart<'_> {
