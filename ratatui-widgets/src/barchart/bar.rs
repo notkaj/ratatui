@@ -284,6 +284,7 @@ impl<'a> Bar<'a> {
 
         if !text.is_empty() {
             let default_style = default_value_style.patch(self.value_style);
+            let value_x = area.right();
 
             // Since the value may be longer thanthe bar itself, we need to use 2 different styles
             // while rendering. Render the second part with the default value style
@@ -295,7 +296,7 @@ impl<'a> Bar<'a> {
 
                 let bar_style = bar_style.patch(self.style);
                 buf.set_stringn(
-                    area.width - text_length as u16,
+                    value_x - text_length as u16,
                     area.y,
                     first,
                     over_length,
@@ -303,7 +304,7 @@ impl<'a> Bar<'a> {
                 );
 
                 buf.set_stringn(
-                    area.width - second.len() as u16,
+                    value_x - second.len() as u16,
                     area.y,
                     second,
                     bar_length,
@@ -313,7 +314,7 @@ impl<'a> Bar<'a> {
             }
 
             buf.set_stringn(
-                area.width - text_length as u16,
+                value_x - text_length as u16,
                 area.y,
                 text,
                 bar_length,
