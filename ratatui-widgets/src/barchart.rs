@@ -719,7 +719,7 @@ impl BarChart<'_> {
             .max()
             .unwrap_or(0) as u16;
 
-        let label_x = area.width - label_size;
+        let label_x = area.right() - label_size;
         let bars_area = {
             let margin = u16::from(label_size != 0);
             Rect {
@@ -740,13 +740,9 @@ impl BarChart<'_> {
 
                 for y in 0..self.bar_width {
                     let bar_y = bar_y + y;
-                    for x in 0..bars_area.width {
-                        let symbol = if x < bar_length {
-                            self.bar_set.full
-                        } else {
-                            self.bar_set.empty
-                        };
-                        buf[(bars_area.right() - x, bar_y)]
+                    for i in 0..bar_length {
+                        let symbol = self.bar_set.full;
+                        buf[(bars_area.right() - 1 - i, bar_y)]
                             .set_symbol(symbol)
                             .set_style(bar_style);
                     }
