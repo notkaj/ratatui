@@ -293,7 +293,7 @@ impl<'a> Bar<'a> {
                 let over_length = text_length - bar_length; // this won't overflow, text_length is larger
 
                 // apparently this `split_at` function was buggy for a while, but i think it's fixed now.
-                // the non-inverted version of this still does some funky stuff
+                // the non-inverted version of this still does some funky workaround it seems like.
                 let (first, second) = text.split_at(over_length);
 
                 let bar_style = bar_style.patch(self.style);
