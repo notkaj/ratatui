@@ -437,6 +437,7 @@ impl<'a> BarChart<'a> {
     #[must_use = "method moves the value of self and returns the modified value"]
     pub const fn inverted(mut self) -> Self {
         self.is_inverted = true;
+        self.bar_set = symbols::bar::UPPER_NINE_LEVELS;
         self
     }
 }
@@ -784,15 +785,17 @@ impl BarChart<'_> {
     }
 
     fn render_vertical_inverted(&self, buf: &mut Buffer, area: Rect) {
-        // let label_info = self.label_info(area.height.saturating_sub(1));
-        let label_info = self.label_info(area.y.saturating_add(1));
+        let label_info = self.label_info(area.height.saturating_sub(1));
 
         let bars_area = Rect {
-            y: area.y.saturating_add(label_info.height),
+            y: area.top().saturating_add(label_info.height),
             ..area
         };
 
-        let group_ticks = self.group_ticks(bars_area.width, bars_area.height);
+        // TODO: the non-inverted version of this doesn't account for label height :/, which i
+        // believe is incorrect. i increment throught the ticks differently so it was an issue for
+        // me
+        let group_ticks = self.group_ticks(bars_area.width, bars_area.height - label_info.height);
         self.render_vertical_bars_inverted(bars_area, buf, &group_ticks);
         self.render_labels_and_values_inverted(area, buf, label_info, &group_ticks);
     }
@@ -849,18 +852,18 @@ impl BarChart<'_> {
     ) {
         // print labels and values in one go
         let mut bar_x = area.left();
-        let bar_y = area.top() + label_info.height + 1;
+        let bar_y = area.top() + label_info.height;
         for (group, ticks_vec) in self.data.iter().zip(group_ticks) {
             if group.bars.is_empty() {
                 continue;
             }
-            // print group labels under the bars or the previous labels
+            // print group labels over the bars or the previous labels
             if label_info.group_label_visible {
                 let label_max_width =
                     ticks_vec.len() as u16 * (self.bar_width + self.bar_gap) - self.bar_gap;
                 let group_area = Rect {
                     x: bar_x,
-                    y: area.top() + 1,
+                    y: area.top(),
                     width: label_max_width,
                     height: 1,
                 };
