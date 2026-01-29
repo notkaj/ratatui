@@ -786,6 +786,104 @@ impl BarChart<'_> {
             }
         }
     }
+
+    fn render_vertical_inverted(&self, buf: &mut Buffer, area: Rect) {
+        // let label_info = self.label_info(area.height.saturating_sub(1));
+        let label_info = self.label_info(area.y.saturating_add(1));
+
+        let bars_area = Rect {
+            y: area.y.saturating_add(label_info.height),
+            ..area
+        };
+
+        let group_ticks = self.group_ticks(bars_area.width, bars_area.height);
+        self.render_vertical_bars_inverted(bars_area, buf, &group_ticks);
+        self.render_labels_and_values_inverted(area, buf, label_info, &group_ticks);
+    }
+
+    fn render_vertical_bars_inverted(
+        &self,
+        area: Rect,
+        buf: &mut Buffer,
+        group_ticks: &[Vec<u64>],
+    ) {
+        // print all visible bars (without labels and values)
+        let mut bar_x = area.left();
+        for (ticks_vec, group) in group_ticks.iter().zip(&self.data) {
+            for (ticks, bar) in ticks_vec.iter().zip(&group.bars) {
+                let mut ticks = *ticks;
+                // for j in 0..area.height {
+                let mut i: u16 = 0;
+                while ticks > 0 {
+                    let symbol = match ticks {
+                        0 => self.bar_set.empty,
+                        1 => self.bar_set.one_eighth,
+                        2 => self.bar_set.one_quarter,
+                        3 => self.bar_set.three_eighths,
+                        4 => self.bar_set.half,
+                        5 => self.bar_set.five_eighths,
+                        6 => self.bar_set.three_quarters,
+                        7 => self.bar_set.seven_eighths,
+                        _ => self.bar_set.full,
+                    };
+
+                    let bar_style = self.bar_style.patch(bar.style);
+
+                    for x in 0..self.bar_width {
+                        buf[(bar_x + x, area.top() + i)]
+                            .set_symbol(symbol)
+                            .set_style(bar_style);
+                    }
+
+                    i = i.saturating_add(1);
+                    ticks = ticks.saturating_sub(8);
+                }
+                bar_x += self.bar_gap + self.bar_width;
+            }
+            bar_x += self.group_gap;
+        }
+    }
+
+    fn render_labels_and_values_inverted(
+        &self,
+        area: Rect,
+        buf: &mut Buffer,
+        label_info: LabelInfo,
+        group_ticks: &[Vec<u64>],
+    ) {
+        // print labels and values in one go
+        let mut bar_x = area.left();
+        let bar_y = area.top() + label_info.height + 1;
+        for (group, ticks_vec) in self.data.iter().zip(group_ticks) {
+            if group.bars.is_empty() {
+                continue;
+            }
+            // print group labels under the bars or the previous labels
+            if label_info.group_label_visible {
+                let label_max_width =
+                    ticks_vec.len() as u16 * (self.bar_width + self.bar_gap) - self.bar_gap;
+                let group_area = Rect {
+                    x: bar_x,
+                    y: area.top() + 1,
+                    width: label_max_width,
+                    height: 1,
+                };
+                group.render_label(buf, group_area, self.label_style);
+            }
+
+            // print the bar values and numbers
+            for (bar, ticks) in group.bars.iter().zip(ticks_vec) {
+                if label_info.bar_label_visible {
+                    bar.render_label(buf, self.bar_width, bar_x, bar_y - 1, self.label_style);
+                }
+
+                bar.render_value(buf, self.bar_width, bar_x, bar_y, self.value_style, *ticks);
+
+                bar_x += self.bar_gap + self.bar_width;
+            }
+            bar_x += self.group_gap;
+        }
+    }
 }
 
 impl Widget for BarChart<'_> {
