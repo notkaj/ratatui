@@ -903,9 +903,11 @@ impl Widget for &BarChart<'_> {
             return;
         }
 
-        match self.direction {
-            Direction::Horizontal => self.render_horizontal(buf, inner),
-            Direction::Vertical => self.render_vertical(buf, inner),
+        match (self.direction, self.is_inverted) {
+            (Direction::Horizontal, false) => self.render_horizontal(buf, inner),
+            (Direction::Vertical, false) => self.render_vertical(buf, inner),
+            (Direction::Horizontal, true) => self.render_horizontal_inverted(buf, inner),
+            (Direction::Vertical, true) => self.render_vertical_inverted(buf, inner),
         }
     }
 }
