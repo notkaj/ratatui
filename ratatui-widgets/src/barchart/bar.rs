@@ -280,7 +280,7 @@ impl<'a> Bar<'a> {
     ) {
         let value = self.value.to_string();
         let text = self.text_value.as_ref().unwrap_or(&value);
-        let text_length = text.len();
+        let text_length = text.chars().count(); // the count, not the len (in bytes)
 
         if !text.is_empty() {
             let default_style = default_value_style.patch(self.value_style);
@@ -292,9 +292,12 @@ impl<'a> Bar<'a> {
                 //Find the last character boundary at or before bar begins
                 let over_length = text_length - bar_length; // this won't overflow, text_length is larger
 
-                // apparently this `split_at` function was buggy for a while, but i think it's fixed now.
-                // the non-inverted version of this still does some funky workaround it seems like. (issue 1928)
-                let (first, second) = text.split_at(over_length);
+                let byte_index = text
+                    .char_indices()
+                    .nth(over_length)
+                    .map_or(text.len(), |(i, _)| i);
+
+                let (first, second) = text.split_at(byte_index);
 
                 let bar_style = bar_style.patch(self.style);
                 buf.set_stringn(
