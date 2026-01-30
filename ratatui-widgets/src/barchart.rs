@@ -1113,16 +1113,10 @@ mod tests {
             ])
             .bar_set(symbols::bar::NINE_LEVELS)
             .inverted();
-        widget.render(Rect::new(0, 1, 18, 2), &mut buffer);
-        // let expected = Buffer::with_lines([
-        //     "                  ",
-        //     "  ▁ ▂ ▃ ▄ ▅ ▆ ▇ 8 ",
-        //     "a b c d e f g h i ",
-        // ]);
+        widget.render(Rect::new(0, 0, 18, 2), &mut buffer);
         let expected = Buffer::with_lines([
             "a b c d e f g h i ",
             "  ▔ 🮂 🮃 ▀ 🮄 🮅 🮆 8 ",
-            "                  ",
             "                  ",
         ]);
         assert_eq!(buffer, expected);
@@ -1262,11 +1256,11 @@ mod tests {
             "   █2",
             "  ██3",
             " ███4",
-            "G1   ",
+            "   G1",
             "  ██3",
             " ███4",
             "████5",
-            "G2   ",
+            "   G2",
         ]);
 
         assert_eq!(buffer, expected);
