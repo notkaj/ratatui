@@ -1355,7 +1355,6 @@ mod tests {
         test_horizontal_bars_label_width_greater_than_bar(Some(Color::White));
     }
 
-    // TODO: don't forget to changes this
     fn test_horizontal_inverted_bars_label_width_greater_than_bar(bar_color: Option<Color>) {
         let mut bar = Bar::default()
             .value(2)
@@ -1809,11 +1808,11 @@ mod tests {
         chart.render(buffer.area, &mut buffer);
         #[rustfmt::skip]
         let expected = Buffer::with_lines([
-            "\u{202f}   ",
-            "\u{202f}   ",
-            "\u{202f}█  ",
-            "\u{202f}██ ",
-            "\u{202f}███",
+            "   \u{202f}",
+            "   \u{202f}",
+            "  █\u{202f}",
+            " ██\u{202f}",
+            "███\u{202f}",
         ]);
         assert_eq!(buffer, expected);
     }
