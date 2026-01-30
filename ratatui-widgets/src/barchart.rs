@@ -1253,25 +1253,15 @@ mod tests {
 
         let mut buffer = Buffer::empty(Rect::new(0, 0, 5, 8));
         chart.render(buffer.area, &mut buffer);
-        // let expected = Buffer::with_lines([
-        //     "2█   ",
-        //     "3██  ",
-        //     "4███ ",
-        //     "G1   ",
-        //     "3██  ",
-        //     "4███ ",
-        //     "5████",
-        //     "G2   ",
-        // ]);
         let expected = Buffer::with_lines([
             "   █2",
             "  ██3",
             " ███4",
-            "   G1",
+            "G1   ",
             "  ██3",
             " ███4",
             "████5",
-            "   G2",
+            "G2   ",
         ]);
 
         assert_eq!(buffer, expected);
