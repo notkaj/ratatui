@@ -1429,6 +1429,31 @@ mod tests {
         assert_eq!(buffer, expected);
     }
 
+    /// Tests horizontal inverted bars label are presents
+    #[test]
+    fn test_horizontal_inverted_label() {
+        let chart = BarChart::default()
+            .direction(Direction::Horizontal)
+            .bar_gap(0)
+            .data(&[("Jan", 10), ("Feb", 20), ("Mar", 5)])
+            .inverted();
+
+        let mut buffer = Buffer::empty(Rect::new(0, 0, 10, 3));
+        chart.render(buffer.area, &mut buffer);
+        #[rustfmt::skip]
+        // let expected = Buffer::with_lines([
+        //     "Jan 10█   ",
+        //     "Feb 20████",
+        //     "Mar 5     ",
+        // ]);
+        let expected = Buffer::with_lines([
+            "   █10 Jan",
+            "████20 Feb",
+            "     5 Mar",
+        ]);
+        assert_eq!(buffer, expected);
+    }
+
     #[test]
     fn test_group_label_style() {
         let chart: BarChart<'_> = BarChart::default()
