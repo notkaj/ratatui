@@ -1248,6 +1248,36 @@ mod tests {
     }
 
     #[test]
+    fn test_horizontal_inverted_bars() {
+        let chart: BarChart<'_> = build_test_barchart().inverted();
+
+        let mut buffer = Buffer::empty(Rect::new(0, 0, 5, 8));
+        chart.render(buffer.area, &mut buffer);
+        // let expected = Buffer::with_lines([
+        //     "2█   ",
+        //     "3██  ",
+        //     "4███ ",
+        //     "G1   ",
+        //     "3██  ",
+        //     "4███ ",
+        //     "5████",
+        //     "G2   ",
+        // ]);
+        let expected = Buffer::with_lines([
+            "   █2",
+            "  ██3",
+            " ███4",
+            "   G1",
+            "  ██3",
+            " ███4",
+            "████5",
+            "   G2",
+        ]);
+
+        assert_eq!(buffer, expected);
+    }
+
+    #[test]
     fn test_horizontal_bars_no_space_for_group_label() {
         let chart: BarChart<'_> = build_test_barchart();
 
