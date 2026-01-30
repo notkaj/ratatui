@@ -129,28 +129,30 @@ impl<'a> BarGroup<'a> {
         }
     }
 
-    pub(super) fn render_label_inverted(
+    pub(super) fn render_label_with_default_alignment(
         &self,
         buf: &mut Buffer,
         area: Rect,
         default_label_style: Style,
+        default_alignment: Alignment,
     ) {
         if let Some(label) = &self.label {
             // align the label. Necessary to do it this way as we don't want to set the style
             // of the whole area, just the label area
             let width = label.width() as u16;
-            let area = match label.alignment {
-                Some(Alignment::Center) => Rect {
+            let alignment = label.alignment.unwrap_or(default_alignment);
+            let area = match alignment {
+                Alignment::Center => Rect {
                     x: area.x + (area.width.saturating_sub(width)) / 2,
                     width,
                     ..area
                 },
-                Some(Alignment::Left) => Rect { width, ..area },
-                _ => Rect {
+                Alignment::Right => Rect {
                     x: area.x + area.width.saturating_sub(width),
                     width,
                     ..area
                 },
+                Alignment::Left => Rect { width, ..area },
             };
             buf.set_style(area, default_label_style);
             label.render(area, buf);
