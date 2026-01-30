@@ -4,7 +4,7 @@ use alloc::vec;
 use alloc::vec::Vec;
 
 use ratatui_core::buffer::Buffer;
-use ratatui_core::layout::{Direction, Rect};
+use ratatui_core::layout::{Alignment, Direction, Rect};
 use ratatui_core::style::{Style, Styled};
 use ratatui_core::symbols;
 use ratatui_core::text::Line;
@@ -778,7 +778,12 @@ impl BarChart<'_> {
                     y: label_y,
                     ..bars_area
                 };
-                group.render_label(buf, label_rect, self.label_style);
+                group.render_label_with_default_alignment(
+                    buf,
+                    label_rect,
+                    self.label_style,
+                    Alignment::Right,
+                );
                 bar_y += self.group_gap;
             }
         }
