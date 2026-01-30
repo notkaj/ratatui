@@ -1092,6 +1092,38 @@ mod tests {
     }
 
     #[test]
+    fn bar_set_upper_nine_levels() {
+        let mut buffer = Buffer::empty(Rect::new(0, 0, 18, 3));
+        let widget = BarChart::default()
+            .data(&[
+                ("a", 0),
+                ("b", 1),
+                ("c", 2),
+                ("d", 3),
+                ("e", 4),
+                ("f", 5),
+                ("g", 6),
+                ("h", 7),
+                ("i", 8),
+            ])
+            .bar_set(symbols::bar::NINE_LEVELS)
+            .inverted();
+        widget.render(Rect::new(0, 1, 18, 2), &mut buffer);
+        // let expected = Buffer::with_lines([
+        //     "                  ",
+        //     "  ▁ ▂ ▃ ▄ ▅ ▆ ▇ 8 ",
+        //     "a b c d e f g h i ",
+        // ]);
+        let expected = Buffer::with_lines([
+            "a b c d e f g h i ",
+            "  ▔ 🮂 🮃 ▀ 🮄 🮅 🮆 8 ",
+            "                  ",
+            "                  ",
+        ]);
+        assert_eq!(buffer, expected);
+    }
+
+    #[test]
     fn value_style() {
         let mut buffer = Buffer::empty(Rect::new(0, 0, 10, 3));
         let widget = BarChart::default()
