@@ -1355,6 +1355,62 @@ mod tests {
         test_horizontal_bars_label_width_greater_than_bar(Some(Color::White));
     }
 
+    // TODO: don't forget to changes this
+    fn test_horizontal_inverted_bars_label_width_greater_than_bar(bar_color: Option<Color>) {
+        let mut bar = Bar::default()
+            .value(2)
+            .text_value("label")
+            .value_style(Style::default().red());
+
+        if let Some(color) = bar_color {
+            bar = bar.style(Style::default().fg(color));
+        }
+
+        let chart: BarChart<'_> = BarChart::default()
+            .data(BarGroup::default().bars(&[bar, Bar::default().value(5)]))
+            .direction(Direction::Horizontal)
+            .bar_style(Style::default().yellow())
+            .value_style(Style::default().italic())
+            .bar_gap(0)
+            .inverted();
+
+        let mut buffer = Buffer::empty(Rect::new(0, 0, 5, 2));
+        chart.render(buffer.area, &mut buffer);
+
+        let mut expected = Buffer::with_lines(["label", "████5"]);
+
+        // first line has a yellow foreground. first cell contains italic "5"
+        expected[(4, 1)].modifier.insert(Modifier::ITALIC);
+        for x in 0..5 {
+            expected[(x, 1)].set_fg(Color::Yellow);
+        }
+
+        let expected_color = bar_color.unwrap_or(Color::Yellow);
+
+        // second line contains the word "label". Since the bar value is 2,
+        // then the first 2 characters of "label" are italic red.
+        // the rest is white (using the Bar's style).
+        let cell = expected[(4, 0)].set_fg(Color::Red);
+        cell.modifier.insert(Modifier::ITALIC);
+        let cell = expected[(3, 0)].set_fg(Color::Red);
+        cell.modifier.insert(Modifier::ITALIC);
+        expected[(2, 0)].set_fg(expected_color);
+        expected[(1, 0)].set_fg(expected_color);
+        expected[(0, 0)].set_fg(expected_color);
+
+        assert_eq!(buffer, expected);
+    }
+
+    #[test]
+    fn test_horizontal_inverted_bars_label_width_greater_than_bar_without_style() {
+        test_horizontal_inverted_bars_label_width_greater_than_bar(None);
+    }
+
+    #[test]
+    fn test_horizontal_inverted_bars_label_width_greater_than_bar_with_style() {
+        test_horizontal_inverted_bars_label_width_greater_than_bar(Some(Color::White));
+    }
+
     /// Tests horizontal bars label are presents
     #[test]
     fn test_horizontal_label() {
